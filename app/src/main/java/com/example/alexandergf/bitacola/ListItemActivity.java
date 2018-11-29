@@ -13,8 +13,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,12 +39,27 @@ public class ListItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_item);
 
-
         items=new ArrayList<>();
-        items.add(new BiTacolaItem("Potatoes"));
-        items.add(new BiTacolaItem("Toilet Paper"));
+       // items.add(new BiTacolaItem("Potatoes"));
+        //items.add(new BiTacolaItem("Toilet Paper"));
 
         items_view = findViewById(R.id.items_view);
+
+        db.collection("Users").document("test").collection("Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                items.clear();
+                for (DocumentSnapshot doc : documentSnapshots) {
+                    String title = doc.getString("title");
+                    items.add(new BiTacolaItem(title));
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+        //TODO: Arreglar que  muestre los campos del firebase.
+
+
 
 
         adapter = new Adapter();
