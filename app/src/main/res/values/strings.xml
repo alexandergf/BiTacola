@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BiTacola</string>
+    <string name="description">Descripció</string>
 </resources>
