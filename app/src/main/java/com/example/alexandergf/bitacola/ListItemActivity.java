@@ -52,7 +52,8 @@ public class ListItemActivity extends AppCompatActivity {
                 items.clear();
                 for (DocumentSnapshot doc : documentSnapshots) {
                     String title = doc.getString("title");
-                    items.add(new BiTacolaItem(title));
+                    String id = doc.getId();
+                    items.add(new BiTacolaItem(title,id));
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -97,8 +98,8 @@ public class ListItemActivity extends AppCompatActivity {
         //Toast.makeText(this, "Ave maria", Toast.LENGTH_SHORT).show();
         BiTacolaItem item = items.get(pos);
         Intent intent = new Intent(this,ItemActivity.class);
-        intent.putExtra("title",item.getName());
-        startActivityForResult(intent,0);
+        intent.putExtra("id",item.getId());
+        startActivity(intent);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder{

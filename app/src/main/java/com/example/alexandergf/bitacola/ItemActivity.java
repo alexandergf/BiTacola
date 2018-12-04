@@ -8,23 +8,53 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+
+import static java.lang.String.valueOf;
+
 public class ItemActivity extends AppCompatActivity {
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
 
-        TextView title_view = findViewById(R.id.title_view);
+        final TextView title_view = findViewById(R.id.title_view);
+        final TextView autor_view = findViewById(R.id.autor_view);
+        final TextView location_view = findViewById(R.id.location_view);
+        final TextView date_view = findViewById(R.id.date_view);
+        final TextView description_view = findViewById(R.id.description_view);
+
 
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
+        String id = intent.getStringExtra("id");
 
-        title_view.setText(title);
+        db.collection("Folders").document("test").collection("Items").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                //documentSnapshot.getId
+                title_view.setText(documentSnapshot.getString("title"));
+                autor_view.setText(documentSnapshot.getString("autor"));
+                //location_view.setText(valueOf(documentSnapshot.getGeoPoint("location")));
+                SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+                date_view.setText(fmt.format(documentSnapshot.getDate("date")));
+                description_view.setText(documentSnapshot.getString("desc"));
+            }
+        });
+
     }
 
     @Override
@@ -43,6 +73,8 @@ public class ItemActivity extends AppCompatActivity {
             case R.id.menu_esborrar:
                 deleteItem();
                 break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
     }
