@@ -1,6 +1,7 @@
 package com.example.alexandergf.bitacola;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,7 +46,7 @@ public class ListItemActivity extends AppCompatActivity {
 
         items_view = findViewById(R.id.items_view);
 
-        db.collection("Users").document("test").collection("Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("Folders").document("test").collection("Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 items.clear();
@@ -56,10 +57,6 @@ public class ListItemActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
             }
         });
-
-        //TODO: Arreglar que  muestre los campos del firebase.
-
-
 
 
         adapter = new Adapter();
@@ -97,7 +94,11 @@ public class ListItemActivity extends AppCompatActivity {
     }
 
     private void onClickItem(int pos) {
-        Toast.makeText(this, "Ave maria", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Ave maria", Toast.LENGTH_SHORT).show();
+        BiTacolaItem item = items.get(pos);
+        Intent intent = new Intent(this,ItemActivity.class);
+        intent.putExtra("title",item.getName());
+        startActivityForResult(intent,0);
     }
 
     public class ItemHolder extends RecyclerView.ViewHolder{
