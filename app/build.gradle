@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.example.alexandergf.bitacola"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -29,6 +29,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
+    // FirebaseUI Storage only
+    // implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

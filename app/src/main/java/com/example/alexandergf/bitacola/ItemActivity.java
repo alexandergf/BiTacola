@@ -1,18 +1,29 @@
 package com.example.alexandergf.bitacola;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -23,11 +34,15 @@ public class ItemActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item);
 
+
+        final ImageView imageView = findViewById(R.id.imageView);
         final TextView title_view = findViewById(R.id.title_view);
         final TextView autor_view = findViewById(R.id.autor_view);
         final TextView location_view = findViewById(R.id.location_view);
@@ -55,6 +70,16 @@ public class ItemActivity extends AppCompatActivity {
             }
         });
 
+        StorageReference imgRef = storageReference.child("test/"+id+".jpg");
+
+        imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(ItemActivity.this)
+                        .load(uri)
+                        .into(imageView);
+            }
+        });
     }
 
     @Override
