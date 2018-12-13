@@ -3,6 +3,7 @@ package com.example.alexandergf.bitacola;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -35,10 +36,14 @@ public class ListItemActivity extends AppCompatActivity {
     private RecyclerView items_view;
     private Adapter adapter;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_item);
+
+        FloatingActionButton addFloatingBtn = findViewById(R.id.addFloatingBtn);
 
         items=new ArrayList<>();
        // items.add(new BiTacolaItem("Potatoes"));
@@ -67,6 +72,18 @@ public class ListItemActivity extends AppCompatActivity {
                 new DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         );
         items_view.setAdapter(adapter);
+
+
+        addFloatingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ListItemActivity.this,EditItemActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+
         /*hola = findViewById(R.id.hola);
 
         db.collection("Bitacola").document("bitacola").addSnapshotListener(new EventListener<DocumentSnapshot>() {

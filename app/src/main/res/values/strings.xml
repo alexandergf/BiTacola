@@ -5,4 +5,7 @@
     <string name="Date">Data</string>
     <string name="edit">Editar</string>
     <string name="delete">Esborrar</string>
+    <string name="location">Localización</string>
+    <string name="saveName">Guarda</string>
+    <string name="cancelName">Cancela</string>
 </resources>

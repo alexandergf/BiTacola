@@ -32,6 +32,7 @@ dependencies {
     // FirebaseUI Storage only
     // implementation 'com.firebaseui:firebase-ui-storage:4.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.android.support:design:27.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
