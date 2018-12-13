@@ -3,4 +3,6 @@
     <string name="description">Descripció</string>
     <string name="title">Títol</string>
     <string name="Date">Data</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Esborrar</string>
 </resources>

@@ -1,8 +1,10 @@
 package com.example.alexandergf.bitacola;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,6 +38,7 @@ public class ItemActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,22 +59,26 @@ public class ItemActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        String id = intent.getStringExtra("id");
+        id = intent.getStringExtra("id");
 
         db.collection("Folders").document("test").collection("Items").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                //documentSnapshot.getId
                 title_view.setText(documentSnapshot.getString("title"));
-                autor_view.setText(documentSnapshot.getString("autor"));
-                //location_view.setText(valueOf(documentSnapshot.getGeoPoint("location")));
+                db.collection("Users").document(documentSnapshot.getString("autor")).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
+                        autor_view.setText(documentSnapshot.getString("name"));
+                    }
+                });
+                location_view.setText(valueOf(documentSnapshot.getGeoPoint("location").getLatitude())+", "+valueOf(documentSnapshot.getGeoPoint("location").getLongitude()));
                 SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
                 date_view.setText(fmt.format(documentSnapshot.getDate("date")));
                 description_view.setText(documentSnapshot.getString("desc"));
             }
         });
 
-        StorageReference imgRef = storageReference.child("test/"+id+".jpg");
+        StorageReference imgRef = storageReference.child("test/"+ id +".jpg");
 
         imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -105,10 +113,29 @@ public class ItemActivity extends AppCompatActivity {
     }
 
     private void deleteItem() {
+        AlertDialog.Builder builder =new AlertDialog.Builder(ItemActivity.this);
+        builder.setMessage("Estàs segur de que vols esborrar aquest ítem?").setTitle("Borrar ítem");
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                db.collection("Folders").document("test").collection("Items").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ItemActivity.this, "Ítem esborrat correctament.", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });//add on failure
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
     }
 
     private void goToEditItem() {
-
+        Intent intent = new Intent(this, EditItemActivity.class);
+        intent.putExtra("id", id);
+        startActivity(intent);
     }
 }
