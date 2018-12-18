@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ public class ItemActivity extends AppCompatActivity {
 
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     private String id;
+    private String lat;
+    private String lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +74,10 @@ public class ItemActivity extends AppCompatActivity {
                         autor_view.setText(documentSnapshot.getString("name"));
                     }
                 });
-                location_view.setText(valueOf(documentSnapshot.getGeoPoint("location").getLatitude())+", "+valueOf(documentSnapshot.getGeoPoint("location").getLongitude()));
+                lat = valueOf(documentSnapshot.getGeoPoint("location").getLatitude());
+                lon = valueOf(documentSnapshot.getGeoPoint("location").getLongitude());
+                String location_text = lat+", "+lon;
+                location_view.setText(location_text);
                 SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
                 date_view.setText(fmt.format(documentSnapshot.getDate("date")));
                 description_view.setText(documentSnapshot.getString("desc"));
@@ -86,6 +92,18 @@ public class ItemActivity extends AppCompatActivity {
                 Glide.with(ItemActivity.this)
                         .load(uri)
                         .into(imageView);
+            }
+        });
+
+        location_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=18&q="+lat+","+lon);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                }
             }
         });
     }
@@ -124,7 +142,12 @@ public class ItemActivity extends AppCompatActivity {
                         Toast.makeText(ItemActivity.this, "Ítem esborrat correctament.", Toast.LENGTH_SHORT).show();
                         finish();
                     }
-                });//add on failure
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ItemActivity.this, "Error al borrar l'ítem.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);
