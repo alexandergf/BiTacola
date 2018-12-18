@@ -19,7 +19,8 @@
         <activity
             android:name=".ItemActivity"
             android:parentActivityName=".ListItemActivity" />
-        <activity android:name=".EditItemActivity"></activity>
+        <activity android:name=".EditItemActivity"
+            android:parentActivityName=".ListItemActivity"/>
     </application>
 
 </manifest>
