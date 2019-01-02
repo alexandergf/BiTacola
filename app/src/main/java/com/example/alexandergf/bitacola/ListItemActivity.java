@@ -74,6 +74,7 @@ public class ListItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ListItemActivity.this,EditItemActivity.class);
+
                 startActivity(intent);
             }
         });

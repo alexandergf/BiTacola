@@ -8,4 +8,5 @@
     <string name="location">Localización</string>
     <string name="saveName">Guarda</string>
     <string name="cancelName">Cancela</string>
+    <string name="localizationText">Click Here</string>
 </resources>
