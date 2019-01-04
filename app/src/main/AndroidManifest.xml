@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.alexandergf.bitacola">
-    <uses-feature android:name="android.hardware.camera"
-        android:required="true"  />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,8 +23,10 @@
         <activity
             android:name=".ItemActivity"
             android:parentActivityName=".ListItemActivity" />
-        <activity android:name=".EditItemActivity"
-            android:parentActivityName=".ListItemActivity"/>
+        <activity
+            android:name=".EditItemActivity"
+            android:parentActivityName=".ListItemActivity" />
+        <activity android:name=".FolderListActivity"></activity>
     </application>
 
 </manifest>

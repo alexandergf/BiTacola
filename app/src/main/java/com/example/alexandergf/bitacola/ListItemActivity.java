@@ -28,8 +28,6 @@ import java.util.List;
 public class ListItemActivity extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    private TextView hola;
     //model
     List<BiTacolaItem> items;
     //referencies pantalla
@@ -46,8 +44,6 @@ public class ListItemActivity extends AppCompatActivity {
         FloatingActionButton addFloatingBtn = findViewById(R.id.addFloatingBtn);
 
         items=new ArrayList<>();
-       // items.add(new BiTacolaItem("Potatoes"));
-        //items.add(new BiTacolaItem("Toilet Paper"));
 
         items_view = findViewById(R.id.items_view);
 
@@ -81,38 +77,9 @@ public class ListItemActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-
-        /*hola = findViewById(R.id.hola);
-
-        db.collection("Bitacola").document("bitacola").addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                String code = documentSnapshot.getString("code");
-                hola.setText(code);
-            }
-        });
-
-        Map<String, Object> campos = new HashMap<>();
-        campos.put("title", "escarabajo");
-        campos.put("fecha", new Date());
-        campos.put("icona", 123);
-        db.collection("Bitacola").document("bitacola").collection("Items").add(campos).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Toast.makeText(ListItemActivity.this, "Gravat!", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ListItemActivity.this, "Ha fallat!", Toast.LENGTH_SHORT).show();
-            }
-        });*/
     }
 
     private void onClickItem(int pos) {
-        //Toast.makeText(this, "Ave maria", Toast.LENGTH_SHORT).show();
         BiTacolaItem item = items.get(pos);
         Intent intent = new Intent(this,ItemActivity.class);
         intent.putExtra("id",item.getId());
