@@ -1,19 +1,12 @@
 package com.example.alexandergf.bitacola;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,24 +19,29 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,12 +56,16 @@ public class EditItemActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int GALLERY_INTENT = 2;
+    static final int MAP_INTENT = 3;
     private String id;
     public Uri image;
+    public CharSequence placeName;
     Calendar mCurrentDate;
 
-    String lat, lon;
-
+    LatLng latLng;
+    GeoPoint point;
+    Boolean flag;
+    byte[] bitImg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,8 +81,11 @@ public class EditItemActivity extends AppCompatActivity {
         final EditText editDesc = findViewById(R.id.editDesc);
         final TextView locText = findViewById(R.id.locText);
 
+
+
         requestPermission();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(EditItemActivity.this);
+
 
 
         getSupportActionBar().setTitle("");
@@ -103,7 +108,6 @@ public class EditItemActivity extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
                         selectedMonth++;
                         editDate.setText(selectedDay + "-" + selectedMonth + "-" + selectedYear);
-
                         mCurrentDate.set(selectedYear, selectedMonth, selectedDay);
 
                     }
@@ -116,7 +120,7 @@ public class EditItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (ActivityCompat.checkSelfPermission(EditItemActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+               if (ActivityCompat.checkSelfPermission(EditItemActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                     return;
                 }
@@ -124,17 +128,21 @@ public class EditItemActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null){
-                            double latti = location.getLatitude();
-                            double longi = location.getLongitude();
-                            lat=String.valueOf(latti);
-                            lon=String.valueOf(longi);
-                            locText.setText("geo:"+lat+","+lon);
+                            point = new GeoPoint(location.getLatitude(),location.getLongitude());
+                            latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                            LatLngBounds latLngBounds = new LatLngBounds(latLng,latLng);
+
+                            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder().setLatLngBounds(latLngBounds);
+                            try {
+                                startActivityForResult(builder.build(EditItemActivity.this),MAP_INTENT);
+                            } catch (GooglePlayServicesRepairableException e) {
+                                e.printStackTrace();
+                            } catch (GooglePlayServicesNotAvailableException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
-
-                Uri gmmIntentUri = Uri.parse("geo:"+lat+","+lon+"?z=18&q="+lat+","+lon);
-
             }
         });
 
@@ -149,40 +157,71 @@ public class EditItemActivity extends AppCompatActivity {
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("title",editTitle.getText().toString());
-                data.put("desc",editDesc.getText().toString());
-                //TODO: Acabar el insert.
-                data.put("date",editDate.getText());
 
-              db.collection("Folders").document("test").collection("Items")
-                      .add(data)
-              .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                  @Override
-                  public void onSuccess(DocumentReference documentReference) {
-                      Toast.makeText(EditItemActivity.this, "Creado correctamente", Toast.LENGTH_SHORT).show();
-                      finish();
-                  }
-              })
-              .addOnFailureListener(new OnFailureListener() {
-                  @Override
-                  public void onFailure(@NonNull Exception e) {
-                      Toast.makeText(EditItemActivity.this, "Fallo wey", Toast.LENGTH_SHORT).show();
-                  }
-              });
-              //TODO: Solucionar subida de foto cogida de camara.
-                StorageReference filepath = mStorage.child("test").child("venga ya");
-                filepath.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(EditItemActivity.this, "Bieeeeen", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(EditItemActivity.this, "Joooooo", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (editTitle.getText() != null && editDesc.getText() != null && mCurrentDate != null && point != null && editDesc != null && (bitImg != null || image != null)){
+                    final Map<String, Object> data = new HashMap<>();
+                    data.put("title", editTitle.getText().toString());
+                    data.put("desc", editDesc.getText().toString());
+                    //TODO: completar user
+                    data.put("autor", "pepito");
+                    //-----------------------------
+                    final Timestamp cal = new Timestamp(mCurrentDate.getTime());
+                    db.collection("Folders").document("test").collection("Items")
+                            .add(data)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    String idInsert = documentReference.getId();
+                                    db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                            .update("date", cal);
+                                    db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                            .update("location", point);
+                                    db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                            .update("photo", idInsert);
+                                    if (flag == true) {
+                                        StorageReference filepath = mStorage.child("test").child(idInsert);
+                                        filepath.putBytes(bitImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                finish();
+                                                //Toast.makeText(EditItemActivity.this, "Bieeeeen", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(EditItemActivity.this, "No se pudo subir la foto", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } else if (flag == false) {
+                                        StorageReference filepath = mStorage.child("test").child(idInsert);
+                                        filepath.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                finish();
+                                                //Toast.makeText(EditItemActivity.this, "Bieeeeen", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(EditItemActivity.this, "No se pudo subir la foto", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(EditItemActivity.this, "Fallo wey", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+
+                } else{
+                    Toast.makeText(EditItemActivity.this, "Faltan camps per omplir.", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -234,7 +273,7 @@ public class EditItemActivity extends AppCompatActivity {
     }
 
     private void dispatchTakePictureIntent(){
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null){
            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
@@ -242,21 +281,34 @@ public class EditItemActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        final ImageView imgView = findViewById(R.id.imgView);
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
+            flag=true;
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //image="nose";
+            imgView.setImageBitmap(imageBitmap);
+            //Uri tempUri = getImageUri(getApplicationContext(),imageBitmap);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            bitImg = baos.toByteArray();
+
 
         }else if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK){
+            flag=false;
             Uri uri = data.getData();
+            imgView.setImageURI(uri);
             image=uri;
 
 
+        }else if (requestCode == MAP_INTENT && resultCode == RESULT_OK){
+            final TextView locText = findViewById(R.id.locText);
+            Place place = PlacePicker.getPlace(EditItemActivity.this,data);
+            placeName=place.getName();
+            locText.setText(placeName);
         }
     }
 
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},5);
     }
-
 }
