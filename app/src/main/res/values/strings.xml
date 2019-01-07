@@ -9,4 +9,7 @@
     <string name="saveName">Guarda</string>
     <string name="cancelName">Cancela</string>
     <string name="localizationText">Click Here</string>
+    <string name="icon">Icona</string>
+    <string name="share">Compartir</string>
+    <string name="folderCode">Codi de la carpeta</string>
 </resources>

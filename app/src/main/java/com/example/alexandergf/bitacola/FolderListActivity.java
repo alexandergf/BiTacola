@@ -63,6 +63,14 @@ public class FolderListActivity extends AppCompatActivity {
         folders_view.setLayoutManager(new LinearLayoutManager(this));
         folders_view.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         folders_view.setAdapter(adapter);
+
+        addFloatingBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(FolderListActivity.this, EditFolderActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public class FolderListItemHolder extends RecyclerView.ViewHolder{
