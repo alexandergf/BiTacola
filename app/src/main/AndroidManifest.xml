@@ -27,13 +27,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDUq-6pQs7rWpxjODhfeL9Ync_e0KJeIeI"/>
-        <activity android:name=".ListItemActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".ListItemActivity"
+            android:parentActivityName=".FolderListActivity" />
         <activity
             android:name=".ItemActivity"
             android:parentActivityName=".ListItemActivity" />

@@ -63,7 +63,6 @@ public class ListItemActivity extends AppCompatActivity {
 
         Intent intent =getIntent();
         folderId = intent.getStringExtra("folderId");
-
         FloatingActionButton addFloatingBtn = findViewById(R.id.addFloatingBtn);
 
         items=new ArrayList<>();

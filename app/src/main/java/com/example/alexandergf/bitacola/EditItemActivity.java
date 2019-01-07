@@ -100,7 +100,7 @@ public class EditItemActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(EditItemActivity.this);
 
         String titleMaster;
-        if (id!=null){titleMaster="Editar";}else{titleMaster="Crear";}
+        if (itemId!=null){titleMaster="Editar";}else{titleMaster="Crear";}
         getSupportActionBar().setTitle(titleMaster);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
