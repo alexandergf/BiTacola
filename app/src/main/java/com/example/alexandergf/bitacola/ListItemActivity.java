@@ -29,6 +29,7 @@ public class ListItemActivity extends AppCompatActivity {
     //referencies pantalla
     private RecyclerView items_view;
     private Adapter adapter;
+    private String folderId;
 
 
 
@@ -37,13 +38,16 @@ public class ListItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_item);
 
+        Intent intent =getIntent();
+        folderId = intent.getStringExtra("folderId");
+
         FloatingActionButton addFloatingBtn = findViewById(R.id.addFloatingBtn);
 
         items=new ArrayList<>();
 
         items_view = findViewById(R.id.items_view);
 
-        db.collection("Folders").document("test").collection("Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.collection("Folders").document(folderId).collection("Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 items.clear();

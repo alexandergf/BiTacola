@@ -76,7 +76,7 @@ public class FolderListActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     BiTacolaFolder folder = folders.get(getAdapterPosition());
                     Intent intent = new Intent(FolderListActivity.this, ListItemActivity.class);
-                    intent.putExtra("idFolder", folder.getId());
+                    intent.putExtra("folderId", folder.getId());
                     startActivity(intent);
                 }
             });
