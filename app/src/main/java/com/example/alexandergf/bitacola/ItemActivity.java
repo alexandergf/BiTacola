@@ -36,6 +36,7 @@ import static java.lang.String.valueOf;
 
 public class ItemActivity extends AppCompatActivity {
 
+    private static final int EDIT_ITEM = 6;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
@@ -84,7 +85,7 @@ public class ItemActivity extends AppCompatActivity {
             }
         });
 
-        StorageReference imgRef = storageReference.child("test/"+ id +".jpg");
+        StorageReference imgRef = storageReference.child("test/"+ id );
 
         imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -92,6 +93,7 @@ public class ItemActivity extends AppCompatActivity {
                 Glide.with(ItemActivity.this)
                         .load(uri)
                         .into(imageView);
+
             }
         });
 
