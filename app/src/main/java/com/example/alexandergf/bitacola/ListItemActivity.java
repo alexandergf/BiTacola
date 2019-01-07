@@ -82,7 +82,8 @@ public class ListItemActivity extends AppCompatActivity {
     private void onClickItem(int pos) {
         BiTacolaItem item = items.get(pos);
         Intent intent = new Intent(this,ItemActivity.class);
-        intent.putExtra("id",item.getId());
+        intent.putExtra("itemId",item.getId());
+        intent.putExtra("folderId", folderId);
         startActivity(intent);
     }
 

@@ -23,9 +23,9 @@
         android:layout_marginRight="24dp"
         android:layout_marginBottom="24dp"
         android:clickable="true"
+        android:focusable="true"
         app:backgroundTint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_add_black_24dp"
-        android:focusable="true" />
+        app:srcCompat="@drawable/ic_create_new_folder_black_24dp" />
 </android.support.constraint.ConstraintLayout>

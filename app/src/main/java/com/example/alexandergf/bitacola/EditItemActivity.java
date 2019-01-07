@@ -64,7 +64,8 @@ public class EditItemActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int GALLERY_INTENT = 2;
     static final int MAP_INTENT = 3;
-    private String id;
+    private String itemId;
+    private String folderId;
     public Uri image;
     public CharSequence placeName;
     Calendar mCurrentDate;
@@ -91,7 +92,8 @@ public class EditItemActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        id = intent.getStringExtra("id");
+        itemId = intent.getStringExtra("itemId");
+        folderId = intent.getStringExtra("folderId");
 
         requestPermission();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(EditItemActivity.this);
@@ -99,8 +101,8 @@ public class EditItemActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Editar");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (id != null) {
-            db.collection("Folders").document("test").collection("Items").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        if (itemId != null) {
+            db.collection("Folders").document(folderId).collection("Items").document(itemId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                 @Override
                 public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
                     editTitle.setText(documentSnapshot.getString("title"));
@@ -197,22 +199,22 @@ public class EditItemActivity extends AppCompatActivity {
                     data.put("autor", "DBfoJ391KCuluz2sFKqO");
                     //-----------------------------
                     final Timestamp cal = new Timestamp(mCurrentDate.getTime());
-                    if (id!=null){
+                    if (itemId!=null){
 
-                        db.collection("Folders").document("test").collection("Items").document(id).update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        db.collection("Folders").document(folderId).collection("Items").document(itemId).update(data).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                db.collection("Folders").document("test").collection("Items").document(id)
+                                db.collection("Folders").document(folderId).collection("Items").document(itemId)
                                         .update("date", cal);
-                                db.collection("Folders").document("test").collection("Items").document(id)
+                                db.collection("Folders").document(folderId).collection("Items").document(itemId)
                                         .update("location", point);
-                                db.collection("Folders").document("test").collection("Items").document(id)
-                                        .update("photo", id);
+                                db.collection("Folders").document(folderId).collection("Items").document(itemId)
+                                        .update("photo", itemId);
 
                                 if (flag3==true){
-                                    mStorage.child("test").child(id).delete();
+                                    mStorage.child(folderId).child(itemId).delete();
                                     if (flag == true) {
-                                        StorageReference filepath = mStorage.child("test").child(id);
+                                        StorageReference filepath = mStorage.child(folderId).child(itemId);
                                         filepath.putBytes(bitImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -226,7 +228,7 @@ public class EditItemActivity extends AppCompatActivity {
                                             }
                                         });
                                     } else if (flag == false) {
-                                        StorageReference filepath = mStorage.child("test").child(id);
+                                        StorageReference filepath = mStorage.child(folderId).child(itemId);
                                         filepath.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -245,20 +247,20 @@ public class EditItemActivity extends AppCompatActivity {
                         });
                         finish();
                     }else {
-                        db.collection("Folders").document("test").collection("Items")
+                        db.collection("Folders").document(folderId).collection("Items")
                                 .add(data)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
                                         String idInsert = documentReference.getId();
-                                        db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                        db.collection("Folders").document(folderId).collection("Items").document(idInsert)
                                                 .update("date", cal);
-                                        db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                        db.collection("Folders").document(folderId).collection("Items").document(idInsert)
                                                 .update("location", point);
-                                        db.collection("Folders").document("test").collection("Items").document(idInsert)
+                                        db.collection("Folders").document(folderId).collection("Items").document(idInsert)
                                                 .update("photo", idInsert);
                                         if (flag == true) {
-                                            StorageReference filepath = mStorage.child("test").child(idInsert);
+                                            StorageReference filepath = mStorage.child(folderId).child(idInsert);
                                             filepath.putBytes(bitImg).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                 @Override
                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -273,7 +275,7 @@ public class EditItemActivity extends AppCompatActivity {
                                                 }
                                             });
                                         } else if (flag == false) {
-                                            StorageReference filepath = mStorage.child("test").child(idInsert);
+                                            StorageReference filepath = mStorage.child(folderId).child(idInsert);
                                             filepath.putFile(image).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                 @Override
                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
