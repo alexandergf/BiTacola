@@ -2,6 +2,9 @@ package com.example.alexandergf.bitacola;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -31,12 +35,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
 
 import static java.lang.String.valueOf;
 
 public class ItemActivity extends AppCompatActivity {
 
-    private static final int EDIT_ITEM = 6;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
@@ -77,8 +82,7 @@ public class ItemActivity extends AppCompatActivity {
                 });
                 lat = valueOf(documentSnapshot.getGeoPoint("location").getLatitude());
                 lon = valueOf(documentSnapshot.getGeoPoint("location").getLongitude());
-                String location_text = lat+", "+lon;
-                location_view.setText(location_text);
+                location_view.setText(getAddress(documentSnapshot.getGeoPoint("location").getLatitude(),documentSnapshot.getGeoPoint("location").getLongitude()));
                 SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
                 date_view.setText(fmt.format(documentSnapshot.getDate("date")));
                 description_view.setText(documentSnapshot.getString("desc"));
@@ -93,7 +97,6 @@ public class ItemActivity extends AppCompatActivity {
                 Glide.with(ItemActivity.this)
                         .load(uri)
                         .into(imageView);
-
             }
         });
 
@@ -116,7 +119,6 @@ public class ItemActivity extends AppCompatActivity {
         inflater.inflate(R.menu.item_menu, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -162,5 +164,29 @@ public class ItemActivity extends AppCompatActivity {
         Intent intent = new Intent(this, EditItemActivity.class);
         intent.putExtra("id", id);
         startActivity(intent);
+    }
+
+    private String getAddress(double lat,double lng) {
+
+        Geocoder geocoder = new Geocoder(ItemActivity.this, Locale.getDefault());
+        String address="";
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+            Address obj;
+            if (addresses.isEmpty() == false) {
+                obj = addresses.get(0);
+                String  add = obj.getLocality();
+                add = add +", "+ obj.getCountryName();
+                address=add;
+            } else {
+                address="No es troba la direccio afegida";
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        return address;
     }
 }

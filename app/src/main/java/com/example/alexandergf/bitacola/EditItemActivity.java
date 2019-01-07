@@ -57,6 +57,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class EditItemActivity extends AppCompatActivity {
 
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference mStorage = FirebaseStorage.getInstance().getReference();
     private FusedLocationProviderClient mFusedLocationClient;
@@ -69,7 +70,7 @@ public class EditItemActivity extends AppCompatActivity {
     public Uri image;
     public CharSequence placeName;
     Calendar mCurrentDate;
-
+    String autorVIP;
     LatLng latLng;
     GeoPoint point;
     Boolean flag=false,flag2=false,flag3=false;
@@ -98,7 +99,9 @@ public class EditItemActivity extends AppCompatActivity {
         requestPermission();
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(EditItemActivity.this);
 
-        getSupportActionBar().setTitle("Editar");
+        String titleMaster;
+        if (id!=null){titleMaster="Editar";}else{titleMaster="Crear";}
+        getSupportActionBar().setTitle(titleMaster);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (itemId != null) {
@@ -106,12 +109,7 @@ public class EditItemActivity extends AppCompatActivity {
                 @Override
                 public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
                     editTitle.setText(documentSnapshot.getString("title"));
-                    /*db.collection("Users").document(documentSnapshot.getString("autor")).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                        @Override
-                        public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
-                            autor_view.setText(documentSnapshot.getString("name"));
-                        }
-                    });*/
+                    autorVIP=documentSnapshot.getString("autor");
                     point=documentSnapshot.getGeoPoint("location");
                     latLng = new LatLng(documentSnapshot.getGeoPoint("location").getLatitude(),documentSnapshot.getGeoPoint("location").getLongitude());
                     locText.setText(getAddress(documentSnapshot.getGeoPoint("location").getLatitude(),documentSnapshot.getGeoPoint("location").getLongitude()));
@@ -125,6 +123,8 @@ public class EditItemActivity extends AppCompatActivity {
                     flag2=true;
                 }
             });
+        }else{
+            autorVIP="DBfoJ391KCuluz2sFKqO";
         }
 
         editDate.setOnClickListener(new View.OnClickListener() {
@@ -191,12 +191,12 @@ public class EditItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (editTitle.getText() != null && editDesc.getText() != null && mCurrentDate != null && point != null && (bitImg != null || image != null)){
+                if (editTitle.getText() != null && autorVIP != null && editDesc.getText() != null && mCurrentDate != null && point != null && (bitImg != null || image != null)){
                     final Map<String, Object> data = new HashMap<>();
                     data.put("title", editTitle.getText().toString());
                     data.put("desc", editDesc.getText().toString());
                     //TODO: completar user
-                    data.put("autor", "DBfoJ391KCuluz2sFKqO");
+                    data.put("autor", autorVIP);
                     //-----------------------------
                     final Timestamp cal = new Timestamp(mCurrentDate.getTime());
                     if (itemId!=null){
@@ -242,10 +242,12 @@ public class EditItemActivity extends AppCompatActivity {
                                             }
                                         });
                                     }
+                                }else{
+                                    finish();
                                 }
                             }
                         });
-                        finish();
+
                     }else {
                         db.collection("Folders").document(folderId).collection("Items")
                                 .add(data)
@@ -271,7 +273,6 @@ public class EditItemActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     Toast.makeText(EditItemActivity.this, "No se pudo subir la foto", Toast.LENGTH_SHORT).show();
-
                                                 }
                                             });
                                         } else if (flag == false) {
@@ -331,7 +332,22 @@ public class EditItemActivity extends AppCompatActivity {
            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
-
+    private void posaFoto(final String photoName){
+        final ImageView imgView = findViewById(R.id.imgView);
+        StorageReference imgRef = mStorage.child("test/"+ photoName);
+        imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                imgView.getLayoutParams().height=500;
+                if (uri != null) {
+                    Glide.with(getApplicationContext())
+                            .load(uri)
+                            .into(imgView);
+                }
+                image=uri;
+            }
+        });
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         final ImageView imgView = findViewById(R.id.imgView);
@@ -386,18 +402,5 @@ public class EditItemActivity extends AppCompatActivity {
         }
         return address;
     }
-    private void posaFoto(final String photoName){
-        final ImageView imgView = findViewById(R.id.imgView);
-        StorageReference imgRef = mStorage.child("test/"+ photoName);
-        imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                imgView.getLayoutParams().height=500;
-                Glide.with(EditItemActivity.this)
-                        .load(uri)
-                        .into(imgView);
-                image=uri;
-            }
-        });
-    }
+
 }
