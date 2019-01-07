@@ -46,6 +46,7 @@ public class ItemActivity extends AppCompatActivity {
 
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
     private String id;
+    private String folder;
     private String lat;
     private String lon;
 
@@ -68,9 +69,9 @@ public class ItemActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        id = intent.getStringExtra("id");
-
-        db.collection("Folders").document("test").collection("Items").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        id = intent.getStringExtra("itemId");
+        folder = intent.getStringExtra("folderId");
+        db.collection("Folders").document(folder).collection("Items").document(id).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(DocumentSnapshot documentSnapshot, FirebaseFirestoreException e) {
                 title_view.setText(documentSnapshot.getString("title"));
@@ -94,7 +95,7 @@ public class ItemActivity extends AppCompatActivity {
         imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Glide.with(ItemActivity.this)
+                Glide.with(getApplicationContext())
                         .load(uri)
                         .into(imageView);
             }
@@ -111,12 +112,18 @@ public class ItemActivity extends AppCompatActivity {
                 }
             }
         });
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //AlertDialog.Builder alertDialog = new AlertDialog.Builder(EditItemActivity.this);
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.item_menu, menu);
+        inflater.inflate(R.menu.item_menu2, menu);
         return true;
     }
     @Override
@@ -125,8 +132,8 @@ public class ItemActivity extends AppCompatActivity {
             case R.id.menu_editar:
                 goToEditItem();
                 break;
-            case R.id.menu_esborrar:
-                deleteItem();
+            case android.R.id.home:
+                onBackPressed();
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -134,35 +141,10 @@ public class ItemActivity extends AppCompatActivity {
         return true;
     }
 
-    private void deleteItem() {
-        AlertDialog.Builder builder =new AlertDialog.Builder(ItemActivity.this);
-        builder.setMessage("Estàs segur de que vols esborrar aquest ítem?").setTitle("Borrar ítem");
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                db.collection("Folders").document("test").collection("Items").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(ItemActivity.this, "Ítem esborrat correctament.", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ItemActivity.this, "Error al borrar l'ítem.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-    }
-
     private void goToEditItem() {
         Intent intent = new Intent(this, EditItemActivity.class);
-        intent.putExtra("id", id);
+        intent.putExtra("itemId", id);
+        intent.putExtra("folderId",folder);
         startActivity(intent);
     }
 

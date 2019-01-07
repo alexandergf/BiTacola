@@ -96,16 +96,6 @@ public class ListItemActivity extends AppCompatActivity {
             }
         });
 
-
-        adapter = new Adapter();
-
-        items_view.setLayoutManager(new LinearLayoutManager(this));
-        items_view.addItemDecoration(
-                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        );
-        items_view.setAdapter(adapter);
-
-
         addFloatingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,6 +144,9 @@ public class ListItemActivity extends AppCompatActivity {
                                 case R.id.menu_esborrar:
                                     deleteItem(id,getAdapterPosition());
                                     break;
+                                case android.R.id.home:
+                                    onBackPressed();
+                                    break;
                             }
                             return true;
                         }
@@ -187,7 +180,7 @@ public class ListItemActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(Uri uri) {
                     if (uri != null){
-                        Glide.with(ListItemActivity.this)
+                        Glide.with(getApplicationContext())
                                 .load(uri)
                                 .into(fotoView);
                     }
@@ -204,7 +197,7 @@ public class ListItemActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 items.remove(pos);
-                db.collection("Folders").document("test").collection("Items").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                db.collection("Folders").document(folderId).collection("Items").document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(ListItemActivity.this, "Ítem esborrat correctament.", Toast.LENGTH_SHORT).show();
