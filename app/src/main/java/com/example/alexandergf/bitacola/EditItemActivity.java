@@ -373,6 +373,7 @@ public class EditItemActivity extends AppCompatActivity {
             final TextView locText = findViewById(R.id.locText);
             Place place = PlacePicker.getPlace(EditItemActivity.this,data);
             placeName=place.getName();
+            point=new GeoPoint (place.getLatLng().latitude,place.getLatLng().longitude);
             locText.setText(placeName);
         }
     }

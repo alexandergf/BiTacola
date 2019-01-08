@@ -98,6 +98,7 @@ public class ListItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ListItemActivity.this,EditItemActivity.class);
+                intent.putExtra("folderId",folderId);
                 startActivity(intent);
             }
         });
@@ -229,7 +230,8 @@ public class ListItemActivity extends AppCompatActivity {
 
     private void goToEditItem(String id) {
         Intent intent = new Intent(this, EditItemActivity.class);
-        intent.putExtra("id", id);
+        intent.putExtra("itemId", id);
+        intent.putExtra("folderId",folderId);
         startActivity(intent);
     }
     public class Adapter extends RecyclerView.Adapter<ItemHolder>{
