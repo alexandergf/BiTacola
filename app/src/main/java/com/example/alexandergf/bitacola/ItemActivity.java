@@ -165,7 +165,7 @@ public class ItemActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }

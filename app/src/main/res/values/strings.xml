@@ -14,4 +14,7 @@
     <string name="share">Compartir</string>
     <string name="folderCode">Codi de la carpeta</string>
     <string name="share_by_email">Introdueix els correus separats per un \";\".</string>
+    <string name="nuevo">New</string>
+    <string name="logIn">Log In</string>
+    <string name="nameUser">Name User</string>
 </resources>

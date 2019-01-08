@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import java.util.Arrays;
 import java.util.List;
 
-class SelectIconActivity extends AppCompatActivity {
+public class SelectIconActivity extends AppCompatActivity {
 
     private List<String> icons = Arrays.asList(
             "ic_audiotrack_black_24dp", "ic_folder_black_24dp", "ic_local_florist_black_24dp", "ic_nature_people_black_24dp", "ic_restaurant_black_24dp", "ic_school_black_24dp", "ic_videogame_asset_black_24dp"
@@ -40,6 +40,7 @@ class SelectIconActivity extends AppCompatActivity {
         setResult(RESULT_OK, data);
         finish();
     }
+
 
     private class IconViewHolder extends RecyclerView.ViewHolder{
         View icon_view;
@@ -70,7 +71,6 @@ class SelectIconActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull IconViewHolder holder, int position) {
             holder.icon_view.setBackground(Drawable.createFromPath(icons.get(position)));
         }
-
         @Override
         public int getItemCount() {
             return icons.size();

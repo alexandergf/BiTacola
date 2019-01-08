@@ -40,16 +40,22 @@ public class FolderListActivity extends AppCompatActivity {
     private RecyclerView folders_view;
     private FolderListAdapter adapter;
     private FloatingActionButton addFloatingBtn;
-
+    String nameUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_folder_list);
 
+
         folders = new ArrayList<>();
 
         folders_view = findViewById(R.id.folders_view);
         addFloatingBtn = findViewById(R.id.addFloatingBtn);
+        /*--------------------------------------------------Para los users
+        Intent intent = getIntent();
+        nameUser = intent.getStringExtra("user");*/
+        //db.collection("Users").document(nameUser).
+        //--------------------------------------------------
 
         db.collection("Folders").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -115,6 +121,7 @@ public class FolderListActivity extends AppCompatActivity {
                             return true;
                         }
                     });
+                    popupMenu.show();
                 }
             });
 
@@ -127,7 +134,7 @@ public class FolderListActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
-            }
+        }
 
         public void bind(BiTacolaFolder folder) {
             folder_name.setText(folder.getTitle());

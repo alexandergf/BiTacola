@@ -53,8 +53,6 @@ public class ListItemActivity extends AppCompatActivity {
     private Adapter adapter;
     private String folderId;
 
-
-
     SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
