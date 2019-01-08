@@ -209,7 +209,7 @@ public class ListItemActivity extends AppCompatActivity {
                     }
                 });
 
-                StorageReference filepath = storageReference.child("test").child(id);
+                StorageReference filepath = storageReference.child(folderId).child(id);
                 filepath.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
